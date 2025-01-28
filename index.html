@@ -28,11 +28,12 @@
         }
         label {
             display: block;
-            margin-top: 20px; /* Mehr Abstand zwischen den Feldern */
+            margin-top: 20px;
             font-weight: bold;
             color: #34495e;
         }
         input[type="text"],
+        input[type="date"],
         textarea {
             width: 100%;
             padding: 10px;
@@ -43,6 +44,7 @@
             box-sizing: border-box;
         }
         input[type="text"]:focus,
+        input[type="date"]:focus,
         textarea:focus {
             border-color: #3498db;
             outline: none;
@@ -116,8 +118,9 @@
         <label for="artist">ARTIST:</label>
         <input type="text" id="artist" placeholder="Artist Name">
 
+        <!-- Datumsauswahl -->
         <label for="day-date">DAY & DATE:</label>
-        <input type="text" id="day-date" placeholder="Day & Date">
+        <input type="date" id="day-date">
 
         <label for="city-country">CITY & COUNTRY:</label>
         <input type="text" id="city-country" placeholder="City & Country">
@@ -230,10 +233,22 @@
     </div>
 
     <script>
+        // Funktion zur Umwandlung des Datums in das englische Format
+        function formatDate(date) {
+            const months = [
+                "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+                "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+            ];
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day}. ${month} ${year}`;
+        }
+
         function generateOutput() {
             // Hole die Werte aus den Eingabefeldern
             const artist = document.getElementById('artist').value;
-            const dayDate = document.getElementById('day-date').value;
+            const dayDateInput = document.getElementById('day-date').value;
             const cityCountry = document.getElementById('city-country').value;
             const venue = document.getElementById('venue').value;
             const eventName = document.getElementById('event-name').value;
@@ -266,10 +281,14 @@
             const accountingEmail = document.getElementById('accounting-email').value;
             const advancingEmail = document.getElementById('advancing-email').value;
 
-            // Erstelle den Ausgabetext mit Absätzen
+            // Konvertiere das Datum in das englische Format
+            const date = new Date(dayDateInput);
+            const formattedDate = formatDate(date);
+
+            // Erstelle den Ausgabetext
             const outputText = `
 ARTIST – ${artist}
-DAY & DATE – ${dayDate}
+DAY & DATE – ${formattedDate}
 CITY & COUNTRY – ${cityCountry}
 VENUE / CLUB – ${venue}
 EVENT NAME – ${eventName}
