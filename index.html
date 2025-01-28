@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal Memo Generator</title>
+    <style>
+        /* Flat-UI Stil */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-top: 20px; /* Mehr Abstand zwischen den Feldern */
+            font-weight: bold;
+            color: #34495e;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .copy-button {
+            margin-top: 10px;
+            background-color: #2ecc71;
+        }
+        .copy-button:hover {
+            background-color: #27ae60;
+        }
+        /* Toast-Notification */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            right: 20px;
+            bottom: 20px;
+            font-size: 14px;
+        }
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        @keyframes fadein {
+            from { bottom: 0; opacity: 0; }
+            to { bottom: 20px; opacity: 1; }
+        }
+        @keyframes fadeout {
+            from { bottom: 20px; opacity: 1; }
+            to { bottom: 0; opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Deal Memo Generator</h1>
+    <div class="form-container">
+        <!-- Künstler und Event-Details -->
+        <label for="artist">ARTIST:</label>
+        <input type="text" id="artist" placeholder="Artist Name">
+
+        <label for="day-date">DAY & DATE:</label>
+        <input type="text" id="day-date" placeholder="Day & Date">
+
+        <label for="city-country">CITY & COUNTRY:</label>
+        <input type="text" id="city-country" placeholder="City & Country">
+
+        <label for="venue">VENUE / CLUB:</label>
+        <input type="text" id="venue" placeholder="Venue / Club">
+
+        <label for="event-name">EVENT NAME:</label>
+        <input type="text" id="event-name" placeholder="Event Name">
+
+        <label for="venue-links">VENUE LINKS (WEBSITE & INSTA):</label>
+        <input type="text" id="venue-links" placeholder="Venue Links">
+
+        <label for="promoter-links">PROMOTER LINKS (WEBSITE & FB PAGE & INSTA):</label>
+        <input type="text" id="promoter-links" placeholder="Promoter Links">
+
+        <!-- Billing und Line-Up -->
+        <label for="billing">BILLING (HEADLINER?):</label>
+        <input type="text" id="billing" placeholder="Billing">
+
+        <label for="line-up">PROPOSED LINE UP & SET TIMES:</label>
+        <textarea id="line-up" placeholder="Proposed Line Up & Set Times"></textarea>
+
+        <label for="running-order">FULL RUNNING ORDER / TIMETABLE:</label>
+        <textarea id="running-order" placeholder="Full Running Order / Timetable"></textarea>
+
+        <label for="stages">STAGES PROPOSED:</label>
+        <input type="text" id="stages" placeholder="Stages Proposed">
+
+        <!-- Kapazitäten und Ticketpreise -->
+        <label for="full-capacity">FULL CAPACITY:</label>
+        <input type="text" id="full-capacity" placeholder="Full Capacity">
+
+        <label for="capacity-stage">CAPACITY STAGE/ROOM:</label>
+        <input type="text" id="capacity-stage" placeholder="Capacity Stage/Room">
+
+        <label for="capacity-other">CAPACITY OTHER STAGES/ROOMS:</label>
+        <input type="text" id="capacity-other" placeholder="Capacity Other Stages/Rooms">
+
+        <label for="ticket-price">REGULAR TICKET & VIP TICKET PRICE:</label>
+        <input type="text" id="ticket-price" placeholder="Ticket Prices">
+
+        <label for="sponsors">SPONSORS:</label>
+        <input type="text" id="sponsors" placeholder="Sponsors">
+
+        <!-- Angebot und Vertragsinfos -->
+        <label for="offer">OFFER:</label>
+        <input type="text" id="offer" placeholder="Offer">
+
+        <label for="net-or-wht">IS THE OFFER NET or SUBJECT TO WHT?:</label>
+        <input type="text" id="net-or-wht" placeholder="Net or Subject to WHT?">
+
+        <label for="wht-rate">WHT RATE IF SUBJECT TO TAX?:</label>
+        <input type="text" id="wht-rate" placeholder="WHT Rate">
+
+        <label for="booking-fee">BOOKING FEE (OFFER MUST BE EXCL. 20% BFEE. PLS CONFIRM):</label>
+        <input type="text" id="booking-fee" placeholder="Booking Fee">
+
+        <label for="hotel">5* HOTEL SUGGESTIONS:</label>
+        <input type="text" id="hotel" placeholder="Hotel Suggestions">
+
+        <label for="visa">IS VISA REQUIRED & COSTS:</label>
+        <input type="text" id="visa" placeholder="Visa Required & Costs">
+
+        <label for="flights">FLIGHTS ON TOP or LANDED?:</label>
+        <input type="text" id="flights" placeholder="Flights on Top or Landed?">
+
+        <!-- Promoter und Vertragsinfos -->
+        <label for="promoter-name">PROMOTER NAME & MOBILE:</label>
+        <input type="text" id="promoter-name" placeholder="Promoter Name & Mobile">
+
+        <label for="company-name">COMPANY NAME:</label>
+        <input type="text" id="company-name" placeholder="Company Name">
+
+        <label for="company-address">COMPANY FULL ADDRESS (ADDRESS & NO., CITY & POSTCODE):</label>
+        <input type="text" id="company-address" placeholder="Company Full Address">
+
+        <label for="country">COUNTRY:</label>
+        <input type="text" id="country" placeholder="Country">
+
+        <label for="vat">VAT:</label>
+        <input type="text" id="vat" placeholder="VAT">
+
+        <label for="signee">CONTRACT SIGNEE:</label>
+        <input type="text" id="signee" placeholder="Contract Signee">
+
+        <label for="phone">COMPANY TELEPHONE OR SIGNEE MOBILE:</label>
+        <input type="text" id="phone" placeholder="Phone Number">
+
+        <label for="contract-email">CONTRACT/INVOICING EMAIL:</label>
+        <input type="text" id="contract-email" placeholder="Contract/Invoicing Email">
+
+        <label for="accounting-email">ACCOUNTING EMAIL:</label>
+        <input type="text" id="accounting-email" placeholder="Accounting Email">
+
+        <label for="advancing-email">ADVANCING EMAIL:</label>
+        <input type="text" id="advancing-email" placeholder="Advancing Email">
+
+        <!-- Generate Button -->
+        <button onclick="generateOutput()">Generate Deal Memo</button>
+
+        <!-- Output Box -->
+        <div id="output">Hier erscheint das Deal Memo.</div>
+
+        <!-- Kopieren-Button -->
+        <button class="copy-button" onclick="copyOutput()">Kopieren</button>
+
+        <!-- Toast-Notification -->
+        <div id="toast" class="toast">Deal Memo kopiert!</div>
+    </div>
+
+    <script>
+        function generateOutput() {
+            // Hole die Werte aus den Eingabefeldern
+            const artist = document.getElementById('artist').value;
+            const dayDate = document.getElementById('day-date').value;
+            const cityCountry = document.getElementById('city-country').value;
+            const venue = document.getElementById('venue').value;
+            const eventName = document.getElementById('event-name').value;
+            const venueLinks = document.getElementById('venue-links').value;
+            const promoterLinks = document.getElementById('promoter-links').value;
+            const billing = document.getElementById('billing').value;
+            const lineUp = document.getElementById('line-up').value;
+            const runningOrder = document.getElementById('running-order').value;
+            const stages = document.getElementById('stages').value;
+            const fullCapacity = document.getElementById('full-capacity').value;
+            const capacityStage = document.getElementById('capacity-stage').value;
+            const capacityOther = document.getElementById('capacity-other').value;
+            const ticketPrice = document.getElementById('ticket-price').value;
+            const sponsors = document.getElementById('sponsors').value;
+            const offer = document.getElementById('offer').value;
+            const netOrWht = document.getElementById('net-or-wht').value;
+            const whtRate = document.getElementById('wht-rate').value;
+            const bookingFee = document.getElementById('booking-fee').value;
+            const hotel = document.getElementById('hotel').value;
+            const visa = document.getElementById('visa').value;
+            const flights = document.getElementById('flights').value;
+            const promoterName = document.getElementById('promoter-name').value;
+            const companyName = document.getElementById('company-name').value;
+            const companyAddress = document.getElementById('company-address').value;
+            const country = document.getElementById('country').value;
+            const vat = document.getElementById('vat').value;
+            const signee = document.getElementById('signee').value;
+            const phone = document.getElementById('phone').value;
+            const contractEmail = document.getElementById('contract-email').value;
+            const accountingEmail = document.getElementById('accounting-email').value;
+            const advancingEmail = document.getElementById('advancing-email').value;
+
+            // Erstelle den Ausgabetext mit Absätzen
+            const outputText = `
+ARTIST – ${artist}
+DAY & DATE – ${dayDate}
+CITY & COUNTRY – ${cityCountry}
+VENUE / CLUB – ${venue}
+EVENT NAME – ${eventName}
+VENUE LINKS (WEBSITE & INSTA) – ${venueLinks}
+PROMOTER LINKS (WEBSITE & FB PAGE & INSTA) – ${promoterLinks}
+
+BILLING (HEADLINER?) – ${billing}
+PROPOSED LINE UP & SET TIMES – ${lineUp}
+FULL RUNNING ORDER / TIMETABLE – ${runningOrder}
+STAGES PROPOSED – ${stages}
+
+FULL CAPACITY – ${fullCapacity}
+CAPACITY STAGE/ROOM – ${capacityStage}
+CAPACITY OTHER STAGES/ROOMS – ${capacityOther}
+REGULAR TICKET & VIP TICKET PRICE – ${ticketPrice}
+SPONSORS – ${sponsors}
+
+OFFER – ${offer}
+IS THE OFFER NET or SUBJECT TO WHT? – ${netOrWht}
+WHT RATE IF SUBJECT TO TAX? – ${whtRate}
+BOOKING FEE (OFFER MUST BE EXCL. 20% BFEE. PLS CONFIRM) – ${bookingFee}
+
+5* HOTEL SUGGESTIONS – ${hotel}
+IS VISA REQUIRED & COSTS – ${visa}
+FLIGHTS ON TOP or LANDED? – ${flights}
+
+PROMOTER NAME & MOBILE – ${promoterName}
+
+CONTRACTING INFO:
+COMPANY NAME – ${companyName}
+COMPANY FULL ADDRESS (ADDRESS & NO., CITY & POSTCODE) – ${companyAddress}
+COUNTRY – ${country}
+VAT – ${vat}
+CONTRACT SIGNEE – ${signee}
+COMPANY TELEPHONE OR SIGNEE MOBILE – ${phone}
+CONTRACT/INVOICING EMAIL – ${contractEmail}
+ACCOUNTING EMAIL – ${accountingEmail}
+ADVANCING EMAIL – ${advancingEmail}
+            `;
+
+            // Zeige den Ausgabetext an
+            document.getElementById('output').textContent = outputText.trim();
+        }
+
+        function copyOutput() {
+            const outputText = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(outputText).then(() => {
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
